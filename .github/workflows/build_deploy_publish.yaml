@@ -40,7 +40,7 @@ jobs:
     - name: Build and tag Image
       id: build-image
       run: |
-        docker build -t 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:$IMAGE_TAG .
+        docker build -t 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest .
   
   publish: 
       name: Publish to ECR
@@ -49,5 +49,5 @@ jobs:
       steps:
         - name: Publishing to ECR
           run: | 
-            docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:$IMAGE_TAG
-            echo "image=451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:$IMAGE_TAG" 
+            docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest
+            echo "image=451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest" 
