@@ -1,0 +1,57 @@
+name: Build and Deploy the Application
+
+on:
+  push:
+    branches: [ "feature/ci-cd" ]
+
+env:
+  AWS_REGION: eu-central-1                 
+  ECR_REPOSITORY: serenade 
+  IMAGE_TAG: latext
+
+permissions:
+  contents: read
+
+jobs:
+  Prepare:
+      name: Preparing Environment
+      runs-on: ubuntu-latest
+      steps:
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+    
+        - name: Login to Amazon ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
+
+  Build:
+    name: Building Images
+    runs-on: ubuntu-latest
+    needs: [Prepare]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build and tag Image
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ needs.Prepare.steps.login-ecr.outputs.registry }}
+      run: |
+        docker build -t $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:latest .
+  
+  publish: 
+      name: Publish to ECR
+      runs-on : ubuntu-latest
+      needs: [Build, Prepare]
+      env:
+        ECR_REGISTRY: ${{ needs.Prepare.steps.login-ecr.outputs.registry }}
+      steps:
+        - name: Publishing to ECR
+          run: | 
+            docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG
+            echo "image=$ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
