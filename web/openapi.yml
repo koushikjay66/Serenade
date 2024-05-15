@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  description: "Ki Reply Assesment Test"
+  version: "0.0.1"
+  title: "Serenade"
+  contact:
+    email: "koushikjay66@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+servers:
+  - url : http://localhost:6000
+
+paths:
+  /sayhello:
+    get:
+      tags:
+      - "sayhello"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "sayHelloReply"
+      responses:
+        "200":
+          description: "Ok"

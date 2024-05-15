@@ -33,8 +33,3 @@ hello_world_controller.register_routes()
 def v2_say_hello():
     
     return {"message": "Hello and Welcome"}
-
-
-    
-    if __name__ == "__main__":
-        app.run(debug=True)
