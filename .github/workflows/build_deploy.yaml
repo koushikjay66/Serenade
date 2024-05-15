@@ -1,9 +1,9 @@
 #
-#
-#
+# https://github.com/aws-actions/amazon-ecr-login#docker-credentials
+# https://github.com/aws-samples/docker-ecr-actions-workflow/?tab=readme-ov-file#summary-of-build-steps
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 name: Building the Application for Ki Reply- Serenade
-run-name: Building Serenade Image
+run-name: Building , Deploy and Publish Serenade Application
 on:
   push:
     branches:
@@ -17,3 +17,32 @@ jobs:
       - uses: actions/checkout@v4
       - name: Checkout repo and Build container image
         run: docker build . --file Dockerfile --tag ki-reply-serenade:latest
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::451950674577:role/github-actions-ec2-role
+          aws-region: eu-central-1
+
+      - name: Login to Amazon ECR Private
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: TU-Serenade
+          mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-publish
+        shell: bash
+        env:
+          ECR_REGISTRY: 451950674577.dkr.ecr.eu-central-1.amazonaws.com
+          ECR_REPOSITORY: serenade
+          IMAGE_TAG: ki-reply-serenade:latest
+        run: |
+            docker build . --file Dockerfile --tag ki-reply-serenade:latest
+            docker push "451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:$IMAGE_TAG"
+            echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
+            echo "image_tag=$IMAGE_TAG" 
+            echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      
