@@ -43,7 +43,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
           context: .
-          tags: serenade:latest
+          tags: 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest
           outputs: type=docker,dest=/tmp/serenade.tar
     #https://docs.docker.com/build/ci/github-actions/share-image-jobs/
     - name: Upload artifact
