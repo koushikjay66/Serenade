@@ -41,13 +41,28 @@ jobs:
       id: build-image
       run: |
         docker build -t 451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest .
+    #https://docs.docker.com/build/ci/github-actions/share-image-jobs/
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+          name: $ECR_REPOSITORY
+          path: /tmp/$ECR_REPOSITORY.tar
   
   publish: 
       name: Publish to ECR
       runs-on : ubuntu-latest
       needs: [Build, Prepare]
       steps:
-        - name: Publishing to ECR
-          run: | 
-            docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest
-            echo "image=451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest" 
+          - name: Download artifact
+            uses: actions/download-artifact@v3
+            with:
+              name: $ECR_REPOSITORY
+              path: /tmp
+          - name: Load image
+            run: |
+              docker load --input /tmp/$ECR_REPOSITORY.tar
+              docker image ls -a       
+          - name: Publishing to ECR
+            run: | 
+                docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest
+                echo "image=451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest" 
