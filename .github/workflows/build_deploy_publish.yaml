@@ -23,10 +23,6 @@ jobs:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_REGION }}
-    
-        - name: Login to Amazon ECR
-          id: login-ecr
-          uses: aws-actions/amazon-ecr-login@v1
 
   Build:
     name: Building Images
@@ -65,7 +61,10 @@ jobs:
           - name: Load image
             run: |
               docker load --input /tmp/serenade.tar
-              docker image ls -a       
+
+          - name: Login to Amazon ECR
+            id: login-ecr
+            uses: aws-actions/amazon-ecr-login@v1
           - name: Publishing to ECR
             run: | 
                 docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest
