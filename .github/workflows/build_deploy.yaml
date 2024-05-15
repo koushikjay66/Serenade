@@ -12,7 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - name: Checkout repo and Build container image
@@ -23,22 +22,24 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::451950674577:role/github-actions-ec2-role
           aws-region: eu-central-1
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Login to Amazon ECR Private
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v2
+          with:
+            registries: TU-Serenade
+            mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
 
-      - name: Login to Amazon ECR Private
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registries: TU-Serenade
-          mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
-
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-publish
-        shell: bash
-        env:
-          ECR_REGISTRY: 451950674577.dkr.ecr.eu-central-1.amazonaws.com
-          ECR_REPOSITORY: serenade
-          IMAGE_TAG: ki-reply-serenade:latest
-        run: |
+        - name: Build, tag, and push image to Amazon ECR
+          id: build-publish
+          shell: bash
+          env:
+            ECR_REGISTRY: 451950674577.dkr.ecr.eu-central-1.amazonaws.com
+            ECR_REPOSITORY: serenade
+            IMAGE_TAG: ki-reply-serenade:latest
+          run: |
             docker build . --file Dockerfile --tag ki-reply-serenade:latest
             docker push "451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:$IMAGE_TAG"
             echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
