@@ -1,0 +1,19 @@
+#
+#
+#
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+name: Building the Application for Ki Reply- Serenade
+run-name: Building Serenade Image
+on:
+  push:
+    branches:
+      - feature/ci-cd
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout repo and Build container image
+        run: docker build . --file Dockerfile --tag ki-reply-serenade:latest
