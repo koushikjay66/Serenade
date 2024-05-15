@@ -31,6 +31,7 @@ jobs:
           with:
             registries: TU-Serenade
             mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
+            aws-region: eu-central-1
 
         - name: Build, tag, and push image to Amazon ECR
           id: build-publish
