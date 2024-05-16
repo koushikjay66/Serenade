@@ -2,7 +2,7 @@ name: Build, Deploy and Publish the Application
 
 on:
   push:
-    branches: [ "feature/ci-cd" , "main"]
+    branches: [ "feature/ci-cd" , "dev"]
       
 
 env:
