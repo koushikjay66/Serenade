@@ -64,14 +64,14 @@ jobs:
           - name: Publishing to ECR
             id: push-image
             run: | 
-                docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest
-                echo "image=451950674577.dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY:latest"  >> $GITHUB_OUTPUT
+                docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest
+                echo "image=451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest"  >> $GITHUB_OUTPUT
           #https://github.com/aws-actions/amazon-ecs-deploy-task-definition
           #https://docs.github.com/en/actions/deployment/deploying-to-your-cloud-provider/deploying-to-amazon-elastic-container-service
           - name: AWS ECS Download Task Definition
             id: download-ecs-task-definition
             run: |
-              aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION --query taskDefinition > task-definition.json
+              aws ecs describe-task-definition --task-definition serenade-dev-task-defination --query taskDefinition > task-definition.json
 
           - name: Fill in the new image ID in the Amazon ECS task definition
             id: task-def
@@ -85,7 +85,7 @@ jobs:
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
             with:
               task-definition: ${{ steps.task-def.outputs.task-definition }}
-              service: $ECS_SERVICE_NAME
-              cluster: $ECS_CLUSTER_NAME
+              service: serenade-dev-service
+              cluster: DevCluster2
               wait-for-service-stability: true
     
