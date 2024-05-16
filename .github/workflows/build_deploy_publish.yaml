@@ -79,6 +79,7 @@ jobs:
             with:
               task-definition: task-definition.json
               container-name: web
+              container-port: 6000
               image: ${{ steps.push-image.outputs.image }}
 
           - name: Deploy Amazon ECS task definition
@@ -87,5 +88,6 @@ jobs:
               task-definition: ${{ steps.task-def.outputs.task-definition }}
               service: serenade-cloudformation-stack-PrivateIntegrationsTutorialService73010F72-cwz6ciYKZTEz
               cluster: serenade-cloudformation-stack-PrivateIntegrationsTutorialCluster09C95435-Ggi3UrABDI56
+              
               wait-for-service-stability: true
     
