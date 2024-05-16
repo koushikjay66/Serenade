@@ -38,8 +38,6 @@ jobs:
       name: Publish to ECR
       runs-on : ubuntu-latest
       needs: [Build]
-      outputs:
-        image: ${{ steps.push-image.outputs.image }}
       steps:
           - name: Configure AWS credentials
             uses: aws-actions/configure-aws-credentials@v1
@@ -94,7 +92,7 @@ jobs:
             with:
               task-definition: task-definition.json
               container-name: ${{vars.ECS_CONTAINER_NAME}}
-              image: ${{ needs.publish.outputs.image }}
+              image: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}
 
           - name: Deploy Amazon ECS task definition
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
