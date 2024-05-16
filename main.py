@@ -21,20 +21,22 @@ app = Flask(__name__)
 
 
 
-# Initialize Rest Endpoints
-hello_world_controller:HelloWorldRestController=HelloWorldRestController(flask_app=app)
-hello_world_controller.register_routes()
 
 
-
-# Or we can also do in this way .... 
+# Release Endpoints
 @app.route("/v2/sayhello", methods = ['GET'])
 def v2_say_hello():
     
-    return {"message": "Hello and Welcome"}
+    return {"message": "Hello and Welcome to ki reply assesment of Kowshik"}
 
 
 @app.route("/heartbeat", methods = ['GET'])
-def v2_say_hello():
+def heart_beat():
     
     return {"message": "I am okay!"}
+
+
+
+# Initialize Rest Endpoints with Blueprints
+hello_world_controller:HelloWorldRestController=HelloWorldRestController(flask_app=app)
+hello_world_controller.register_routes()

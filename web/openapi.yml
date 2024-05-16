@@ -12,12 +12,22 @@ servers:
   - url : http://localhost:6000
 
 paths:
-  /sayhello:
+  /v2/sayhello:
     get:
       tags:
       - "sayhello"
-      description: "Multiple status values can be provided with comma separated strings"
+      description: "Just Says Hello "
       operationId: "sayHelloReply"
+      responses:
+        "200":
+          description: "Ok"
+          
+  /heartbeat:
+    get:
+      tags:
+      - "heartbeat"
+      description: "Returns Heartbeat"
+      operationId: "heartbeat"
       responses:
         "200":
           description: "Ok"

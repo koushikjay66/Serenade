@@ -35,7 +35,7 @@ jobs:
           path: /tmp/${{ vars.ECR_REPOSITORY }}.tar
   
   publish: 
-      name: Publish to ECR
+      name: Publish Image to ECR
       runs-on : ubuntu-latest
       needs: [Build]
       steps:
@@ -94,7 +94,7 @@ jobs:
               container-name: ${{vars.ECS_CONTAINER_NAME}}
               image: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}
 
-          - name: Deploy Amazon ECS task definition
+          - name: Deploy ECS task definition
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
             with:
               task-definition: ${{ steps.task-def.outputs.task-definition }}
