@@ -27,7 +27,6 @@ hello_world_controller.register_routes()
 
 
 
-
 # Or we can also do in this way .... 
 @app.route("/v2/sayhello", methods = ['GET'])
 def v2_say_hello():
