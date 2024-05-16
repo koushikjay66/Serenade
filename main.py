@@ -33,3 +33,9 @@ hello_world_controller.register_routes()
 def v2_say_hello():
     
     return {"message": "Hello and Welcome"}
+
+
+@app.route("/heartbeat", methods = ['GET'])
+def v2_say_hello():
+    
+    return {"message": "I am okay!"}

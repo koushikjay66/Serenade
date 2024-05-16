@@ -5,12 +5,9 @@ on:
     branches: [ "feature/ci-cd" ]
 
 env:
-  AWS_REGION: eu-central-1                 
-  ECR_REPOSITORY: serenade 
-  IMAGE_TAG: latest
-  ECS_TASK_DEFINITION: serenade-dev-task-defination:1
-  ECS_SERVICE_NAME: serenade-dev-service
-  ECS_CLUSTER_NAME: DevCluster2
+                                                   # file, e.g. .aws/task-definition.json
+    ARTIFACTORY_IMAGE_TAG: ${{ github.sha }}  
+
 
 permissions:
   contents: read
@@ -30,20 +27,31 @@ jobs:
       uses: docker/build-push-action@v5
       with:
           context: .
-          tags: 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest
-          outputs: type=docker,dest=/tmp/serenade.tar
-    #https://docs.docker.com/build/ci/github-actions/share-image-jobs/
+          tags: ${{ env.ARTIFACTORY_IMAGE_TAG }}:latest
+          outputs: type=docker,dest=/tmp/${{ vars.ECR_REPOSITORY }}.tar
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
           name: serenade
-          path: /tmp/serenade.tar
+          path: /tmp/${{ vars.ECR_REPOSITORY }}.tar
   
   publish: 
       name: Publish to ECR
       runs-on : ubuntu-latest
       needs: [Build]
+      outputs:
+        image: ${{ steps.push-image.outputs.image }}
       steps:
+          - name: Configure AWS credentials
+            uses: aws-actions/configure-aws-credentials@v1
+            with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+
+          - name: Login to Amazon ECR
+            id: login-ecr
+            uses: aws-actions/amazon-ecr-login@v1
           - name: Download artifact
             uses: actions/download-artifact@v3
             with:
@@ -51,23 +59,31 @@ jobs:
               path: /tmp
           - name: Load image
             run: |
-              docker load --input /tmp/serenade.tar
+              docker load --input /tmp/${{ vars.ECR_REPOSITORY }}.tar
+              docker tag ${{ env.ARTIFACTORY_IMAGE_TAG }} ${{ steps.login-ecr.outputs.registry}}/${{ vars.ECS_SERVICE_NAME }}:latest
+
+
+          - name: Publishing to ECR
+            id: push-image
+            run: | 
+                docker push ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECS_SERVICE_NAME }}:latest
+                echo "image=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECS_SERVICE_NAME }}"  >> $GITHUB_OUTPUT
+  deploy:
+    name: Deploy To ECS
+    runs-on : ubuntu-latest
+    needs: [publish]
+      steps:
           - name: Configure AWS credentials
             uses: aws-actions/configure-aws-credentials@v1
             with:
               aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws-region: ${{ secrets.AWS_REGION }}
-          - name: Login to Amazon ECR
+              
+          - name: Login to Amazon ECR (Again ..... !!)
             id: login-ecr
             uses: aws-actions/amazon-ecr-login@v1
-          - name: Publishing to ECR
-            id: push-image
-            run: | 
-                docker push 451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest
-                echo "image=451950674577.dkr.ecr.eu-central-1.amazonaws.com/serenade:latest"  >> $GITHUB_OUTPUT
-          #https://github.com/aws-actions/amazon-ecs-deploy-task-definition
-          #https://docs.github.com/en/actions/deployment/deploying-to-your-cloud-provider/deploying-to-amazon-elastic-container-service
+          
           - name: AWS ECS Download Task Definition
             id: download-ecs-task-definition
             run: |
@@ -79,7 +95,7 @@ jobs:
             with:
               task-definition: task-definition.json
               container-name: serenade-web
-              image: ${{ steps.push-image.outputs.image }}
+              image: ${{ needs.push-image.outputs.image }}
 
           - name: Deploy Amazon ECS task definition
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -87,6 +103,5 @@ jobs:
               task-definition: ${{ steps.task-def.outputs.task-definition }}
               service: ${{ vars.ECS_SERVICE_NAME }}
               cluster: ${{ vars.ECS_CLUSTER_NAME }}
-              
               wait-for-service-stability: true
     
