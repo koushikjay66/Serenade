@@ -71,7 +71,7 @@ jobs:
           - name: AWS ECS Download Task Definition
             id: download-ecs-task-definition
             run: |
-              aws ecs describe-task-definition --task-definition PrivateIntegrationsStackSerenadeIntegrationServiceTaskDefB5E162FC --query taskDefinition > task-definition.json
+              aws ecs describe-task-definition --task-definition ${{ vars.ECS_TASK_DEFINITION_NAME }} --query taskDefinition > task-definition.json
 
           - name: Fill in the new image ID in the Amazon ECS task definition
             id: task-def
@@ -85,8 +85,8 @@ jobs:
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
             with:
               task-definition: ${{ steps.task-def.outputs.task-definition }}
-              service: serenade-stack-SerenadeIntegrationService73010F72-xOYP63efXELk 
-              cluster: serenade-stack-SerenadeDevCluster-0MqPxTZKZUg1
+              service: ${{ vars.ECS_SERVICE_NAME }}
+              cluster: ${{ vars.ECS_CLUSTER_NAME }}
               
               wait-for-service-stability: true
     
