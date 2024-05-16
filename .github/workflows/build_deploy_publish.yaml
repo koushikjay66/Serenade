@@ -59,14 +59,14 @@ jobs:
           - name: Load image
             run: |
               docker load --input /tmp/${{ vars.ECR_REPOSITORY }}.tar
-              docker tag ${{ env.ARTIFACTORY_IMAGE_TAG }} ${{ vars.ECR_REGISTRY }}/${{ vars.ECS_SERVICE_NAME }}:latest
+              docker tag ${{ env.ARTIFACTORY_IMAGE_TAG }} ${{ steps.login-ecr.outputs.registry}}/${{ vars.ECR_REPOSITORY }}:latest
 
 
           - name: Publishing to ECR
             id: push-image
             run: | 
-                docker push ${{ vars.ECR_REGISTRY }}/${{ vars.ECS_SERVICE_NAME }}:latest
-                echo "image=${{ vars.ECR_REGISTRY }}/${{ vars.ECS_SERVICE_NAME }}"  >> $GITHUB_OUTPUT
+                docker push ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:latest
+                echo "image=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}"  >> $GITHUB_OUTPUT
   deploy:
       name: Deploy To ECS
       runs-on : ubuntu-latest
