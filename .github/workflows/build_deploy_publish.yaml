@@ -16,19 +16,18 @@ jobs:
   approval:
     name: Manually Approve 
     runs-on : ubuntu-latest
-    
-    if: ${{ github.ref }}  == ${{ vars.PROTECTED_BRANCH }}
+    permissions: write-all
     steps:
       - uses: trstringer/manual-approval@v1
         with:
-          secret: ${{ github.TOKEN }}
-          approvers: ${{ vars.ADMIN_GROUP }} 
-          minimum-approvals: 1
-          issue-title: "Approve Release for Production ?"
-          issue-body: "Please approve or deny the deployment"
-          exclude-workflow-initiator-as-approver: false
-          additional-approved-words: ''
-          additional-denied-words: ''
+              secret: ${{ github.TOKEN }}
+              approvers: ${{ vars.ADMIN_GROUP }} 
+              minimum-approvals: 1
+              issue-title: "Approve Release for Production ?"
+              issue-body: "Please approve or deny the deployment"
+              exclude-workflow-initiator-as-approver: false
+              additional-approved-words: ''
+              additional-denied-words: ''
   
   
   Build:
@@ -85,8 +84,6 @@ jobs:
                 docker push ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:latest
                 echo "image=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}"  >> "$GITHUB_OUTPUT"
   
-  
-          
   
   deploy:
       name: Deploy To ECS
