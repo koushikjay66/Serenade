@@ -2,7 +2,8 @@ name: Build, Deploy and Publish the Application
 
 on:
   push:
-    branches: [ "feature/ci-cd" , "main", "dev"]
+    branches: [ "feature/ci-cd" , "main"]
+      
 
 env:
     ARTIFACTORY_IMAGE_TAG: ${{ github.sha }}  
@@ -14,7 +15,8 @@ permissions:
 jobs:
 
   approval:
-    name: Manually Approve 
+    name: Manually Approve
+    if: ${{ ! startsWith(github.ref, vars.PROTECTED_BRANCH) }}
     runs-on : ubuntu-latest
     permissions: write-all
     steps:
