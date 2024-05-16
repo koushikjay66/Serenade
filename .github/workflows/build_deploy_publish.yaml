@@ -33,7 +33,6 @@ jobs:
       with:
           name: serenade
           path: /tmp/${{ vars.ECR_REPOSITORY }}.tar
-  
   publish: 
       name: Publish Image to ECR
       runs-on : ubuntu-latest
