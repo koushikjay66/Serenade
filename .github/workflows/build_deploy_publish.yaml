@@ -2,7 +2,8 @@ name: Build, Deploy and Publish the Application
 
 on:
   push:
-    branches: ["dev"]
+    branches: [ "feature/ci-cd" , "main"]
+      
 
 env:
     ARTIFACTORY_IMAGE_TAG: ${{ github.sha }}  
@@ -13,30 +14,29 @@ permissions:
 
 jobs:
 
-  # approval:
-  #   name: Manually Approve 
-  #   runs-on : ubuntu-latest
-    
-  #   if: ${{startsWith(github.ref, vars.PROTECTED_BRANCH) }}
-  #   steps:
-
-  #     - uses: trstringer/manual-approval@v1
-  #       with:
-  #             secret: ${{ github.TOKEN }}
-  #             approvers: ${{ vars.ADMIN_GROUP }} 
-  #             minimum-approvals: 1
-  #             issue-title: "Approve Release for Production ?"
-  #             issue-body: "Please approve or deny the deployment"
-  #             exclude-workflow-initiator-as-approver: false
-  #             additional-approved-words: ''
-  #             additional-denied-words: ''
+  approval:
+    name: Manually Approve
+    runs-on : ubuntu-latest
+    permissions: write-all
+    if: ${{startsWith(github.ref, vars.PROTECTED_BRANCH) }}
+    steps:
+      - uses: trstringer/manual-approval@v1
+        with:
+              secret: ${{ github.TOKEN }}
+              approvers: ${{ vars.ADMIN_GROUP }} 
+              minimum-approvals: 1
+              issue-title: "Approve Release for Production ?"
+              issue-body: "Please approve or deny the deployment"
+              exclude-workflow-initiator-as-approver: false
+              additional-approved-words: ''
+              additional-denied-words: ''
   
   
   Build:
     name: Building Images
     runs-on: ubuntu-latest
-    #needs: [approval]
-
+    needs: [approval]
+    if: ${{always() && !startsWith(github.ref, vars.PROTECTED_BRANCH) }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
