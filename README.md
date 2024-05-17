@@ -10,6 +10,9 @@ SERENADE is a small application to test the ability to build, publish and deploy
 - Dev branch works without manual intervention. 
 - Seggregates variables for Production and Dev
 
+## How to Simulate Approval Process for You? 
+Please add your github username (mulltiple comma seperated) in Github actions variable "ADMIN_GROUP"
+
 
 ## How to Run the Application manually
 
