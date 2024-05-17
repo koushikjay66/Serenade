@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+
+env:
+    ARTIFACTORY_IMAGE_TAG: ${{ github.sha }}  
+
 jobs:
 
   approval:
