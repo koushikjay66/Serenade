@@ -11,24 +11,6 @@ permissions:
 
 env:
     ARTIFACTORY_IMAGE_TAG: ${{ github.sha }}  
-
-jobs:
-
-  approval:
-    name: Manually Approve
-    runs-on : ubuntu-latest
-    permissions: write-all
-    if: ${{startsWith(github.ref, vars.PROTECTED_BRANCH) }}
-    steps:
-      - uses: trstringer/manual-approval@v1
-        with:
-              secret: ${{ github.TOKEN }}
-              minimum-approvals: 1
-              issue-title: "Approve Release for Production ?"
-              issue-body: "Please approve or deny the deployment"
-              exclude-workflow-initiator-as-approver: false
-              additional-approved-words: ''
-              additional-denied-words: ''
   
   
   Build:
