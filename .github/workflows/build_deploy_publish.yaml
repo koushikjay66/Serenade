@@ -87,11 +87,11 @@ jobs:
                 echo "image=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}"  >> "$GITHUB_OUTPUT"
   
   
-  deploy:
-      name: Deploy To ECS
+  deploy-to-dev:
+      name: Deploy To DEV ECS
       runs-on : ubuntu-latest
       needs: [publish]
-      if: ${{ github.ref }}  == 'refs/heads/dev'
+      if: ${{!startsWith(github.ref, vars.PROTECTED_BRANCH) }}
       steps:
           - name: Configure AWS credentials
             uses: aws-actions/configure-aws-credentials@v1
@@ -124,4 +124,42 @@ jobs:
               service: ${{ vars.ECS_SERVICE_NAME }}
               cluster: ${{ vars.ECS_CLUSTER_NAME }}
               wait-for-service-stability: false
+    
+  deploy-to-prod:
+                name: Deploy To Prod ECS
+                runs-on : ubuntu-latest
+                needs: [publish]
+                if: ${{startsWith(github.ref, vars.PROTECTED_BRANCH) }}
+                steps:
+                    - name: Configure AWS credentials
+                      uses: aws-actions/configure-aws-credentials@v1
+                      with:
+                        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                        aws-region: ${{ secrets.AWS_REGION }}
+                        
+                    - name: Login to Amazon ECR (Again ..... !!)
+                      id: login-ecr
+                      uses: aws-actions/amazon-ecr-login@v1
+                    
+                    - name: AWS ECS Download Task Definition
+                      id: download-ecs-task-definition
+                      run: |
+                        aws ecs describe-task-definition --task-definition ${{ vars.PROD_ECS_TASK_DEFINITION_NAME }} --query taskDefinition > task-definition.json
+          
+                    - name: Prepare ECS task definition
+                      id: task-def
+                      uses: aws-actions/amazon-ecs-render-task-definition@v1
+                      with:
+                        task-definition: task-definition.json
+                        container-name: ${{vars.ECS_CONTAINER_NAME}}
+                        image: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}
+          
+                    - name: Deploy ECS task definition
+                      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+                      with:
+                        task-definition: ${{ steps.task-def.outputs.task-definition }}
+                        service: ${{ vars.PROD_ECS_SERVICE_NAME }}
+                        cluster: ${{ vars.PROD_ECS_CLUSTER_NAME }}
+                        wait-for-service-stability: false
     
