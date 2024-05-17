@@ -27,7 +27,7 @@ app = Flask(__name__)
 @app.route("/v2/sayhello", methods = ['GET'])
 def v2_say_hello():
     
-    return {"message": "Hello and Welcome to ki reply assesment of Kowshik"}
+    return {"message": "Hello and Welcome to ki reply assesment of Kowshik. Testing app"}
 
 
 @app.route("/heartbeat", methods = ['GET'])
