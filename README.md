@@ -1,10 +1,16 @@
-# Serenade
+# Serenade - KiReply Assessment Test Devops Challenge [Kowshik]
 
-This project is for Ki Reply 2nd Round of technical Interview
+SERENADE is a small application to test the ability to build, publish and deploy using Github Actions. This repository contains a 
 
-## Create the Virtual Environment 
-pip install --upgrade pip
-python3 -m pip install virtualenv
-python3 -m venv env 
-source env/bin/activate
-pip install -r requirements.txt
+- Python Application that releases an endpoint.
+- Automate Build the Docker Image from the Application Docker file
+- Publish Docker image in Registry 
+- Deploy Application in ECS
+- Treats Main branch as Production Branch and requires manual approval before even building the image
+- Dev branch works without manual intervention. 
+- Seggregates variables for Production and Dev
+
+
+## How to Run the Application manually
+
+To Be filledup... 
