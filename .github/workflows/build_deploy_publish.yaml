@@ -23,7 +23,6 @@ jobs:
       - uses: trstringer/manual-approval@v1
         with:
               secret: ${{ github.TOKEN }}
-              approvers: ${{ vars.ADMIN_GROUP }} 
               minimum-approvals: 1
               issue-title: "Approve Release for Production ?"
               issue-body: "Please approve or deny the deployment"
