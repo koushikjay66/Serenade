@@ -1,4 +1,4 @@
-# Serenade - KiReply Assessment Test Devops Challenge [Kowshik]
+# Serenade
 
 SERENADE is a small application to test the ability to build, publish and deploy using Github Actions. This repository contains a 
 
