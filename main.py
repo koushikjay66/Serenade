@@ -24,7 +24,7 @@ app = Flask(__name__)
 
 
 # Release Endpoints
-@app.route("/v2/sayhello", methods = ['GET'])
+@app.route("/v2/sayhello/x", methods = ['GET'])
 def v2_say_hello():
     
     return {"message": "Hello and Welcome to ki reply assesment of Kowshik"}
